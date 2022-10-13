@@ -1,0 +1,53 @@
+*Data codebook*
+
+Project title: Expanding the Data Ark: Retrieving, preserving, and liberating data from highly influential social science papers
+
+Description: This codebook documents the data stored in the file 'data.csv'. The dataset contains information about the 160 social sciences papers included in the study sample. There is one row per article. The information includes bibliogprahic information (e.g., publication source) and the data availability status based on our assessment.
+
+Source: Bibliographic information was obtained from Clarivate Analytics Web of Science Core Collection accessed via Stanford University in April, 2019. Information on data sharing status was manually entered by the authors over the course of the study.
+
+
+Columns:
+
+Throughout, "NA" = "Not applicable".
+
+Column A "Spreadsheet Index Number (by citations)": articles were ordered by number of citations (column I) and assigned sequential integers to provide unique identification numbers for each article.
+
+Column B "Email Doc Index Number (by name)": provides an identification number that corresponds to e-mail correspondence related to this article which is stored in a separate file. The e-mail correspondence itself is not available because we have not sought permission to share it.
+
+Column C "AccessionNumber": refers to the Accession Number that can be used to identify the article in Web of Science.
+
+Column D "doi": the article's Digital Object Identifier, if available.
+
+Column E "PubMedID": the article's PubMed ID, if available.
+
+Column F "title": the article's title.
+
+Column G "authors": the article's authors.
+
+Column H "source": the article's source.
+
+Column I "citations": the number of article citations, according to Web of Science.
+
+Column J "publicationDate": the year of article publication.
+
+Column K "fieldCode": whether the article was classified as medical or non-medical (which was based on whether it did or did not have a PubMed ID).
+
+Column L "dataStatus": the data sharing status assigned to the article. Options were:
+
+10	The data are already available (data sharing statement says they are available and we verified this)
+
+0       No response 1       Online data repository, completely open access 2       Online data repository, controlled access (please state what prerequisites, criteria and processes you might consider for deciding whether to share the data with others) 3       Sharing with the METRICS team only, not to be shared with anyone else 4       Cannot share data (please state the key reason(s)) 5       Pending e.g., data being located/prepared (but no update as of 12th October, 2022)
+6       Considering and will get back to us 7       Wants more information from us before sharing 8       Data sharing system already in place (no restrictions)
+9       Data sharing system already in place (restrictions)
+
+Column M "reasons": If authors say they cannot share data (dataStatus = 4), this column indicates our classification of the reasons authors provided for not sharing. Multiple options are possible.
+
+
+A       legal/ethical
+B       lack of resources C       preparing own sharing system D       data outside of authors control or proprietary E       data no longer exist or cannot be located F       still using the data themselves
+
+
+Column N "requirements": If authors say there is an existing data sharing system with restrictions (i.e., dataStatus = 9), then this column indicates our classification of those requirements. Multiple options are possible.
+ A       No restrictions B       Data use agreement C       Fee D       ethics/IRB E       Share intention for data use F       Collaboration with original authors G       Recognized academic institution H       remote access only
+
