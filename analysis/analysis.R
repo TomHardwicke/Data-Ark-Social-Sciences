@@ -90,4 +90,11 @@ d %>%
   count(reasons) %>%
   filter(reasons != 'NA') 
 
+# citations
+
+d %>%
+  group_by(field, timeFrame) %>%
+  summarise(median = median(citations),
+            IQR_low = quantile(citations, .25),
+            IQR_high = quantile(citations, .75))
 
