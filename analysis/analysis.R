@@ -69,6 +69,7 @@ d %>%
   scale_fill_manual(values = c(green, yellow, red)) +
   scale_shape_manual(name = 'domain', values = c(21,24)) +
   xlab('time period') +
+  ylab('number of articles') +
   guides(fill = 'none') +
   theme_minimal(base_size = 18) +
   theme(panel.background = element_rect(fill = 'white', colour = 'black'),
