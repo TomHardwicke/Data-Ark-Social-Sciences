@@ -1,5 +1,6 @@
 library(tidyverse)
 library(here)
+library(DescTools)
 
 red <- "#fdd2ce"
 yellow <- "#f2d15a"
@@ -67,9 +68,10 @@ d %>%
   geom_point(size = 5, alpha = 1, colour ='black', aes(fill = dataStatusHigh)) +
   facet_wrap(~ dataStatusHigh) +
   scale_fill_manual(values = c(green, yellow, red)) +
-  scale_shape_manual(name = 'domain', values = c(21,24)) +
-  xlab('time period') +
-  ylab('number of articles') +
+  scale_shape_manual(name = 'Domain', values = c(21,24)) +
+  ylim(c(0,40)) +
+  xlab('Time period') +
+  ylab('Number of articles') +
   guides(fill = 'none') +
   theme_minimal(base_size = 18) +
   theme(panel.background = element_rect(fill = 'white', colour = 'black'),
@@ -98,4 +100,10 @@ d %>%
   summarise(median = median(citations),
             IQR_low = quantile(citations, .25),
             IQR_high = quantile(citations, .75))
+
+# confidence intervals
+MultinomCI(d %>% 
+             count(dataStatusHigh, .drop = F) %>% pull(n),
+           conf.level=0.95,
+           method="sisonglaz")
 
