@@ -6,7 +6,7 @@ red <- "#fdd2ce"
 yellow <- "#f2d15a"
 green <- "#b8e6c0"
 
-d <- read_csv(here('data','data.csv')) 
+d <- read_csv(here('data','data.csv')) # load data
 
 # add higher level data status classification layer
 d <- d %>%
