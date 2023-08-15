@@ -1,0 +1,170 @@
+---
+title: "Analysis for Data Ark Social Sciences"
+format: pdf
+---
+
+
+```{r}
+library(tidyverse)
+library(here)
+library(DescTools)
+
+red <- "#fdd2ce"
+yellow <- "#f2d15a"
+green <- "#b8e6c0"
+
+d <- read_csv(here('data','data.csv')) # load data
+
+# add higher level data status classification layer
+d <- d %>%
+  mutate(dataStatusHigh = case_when(
+    dataStatus %in% c(10,1,8) ~ "Available, unrestricted",
+    dataStatus %in% c(2,3,9) ~ "Available, restricted",
+    dataStatus %in% c(0,4,5,6) ~ "Not available",
+    TRUE ~ "CLASSIFICATION ERROR"
+  ))
+
+# recode data status numbers to text labels
+d <- d %>%
+  mutate(dataStatusLabel = case_when(
+    dataStatus == 0 ~ "No response",
+    dataStatus == 1 ~ "Data Ark, unrestricted",
+    dataStatus == 2 ~ "Data Ark, restricted",
+    dataStatus == 3 ~ "METRICS only",
+    dataStatus == 4 ~ "Will not share",
+    dataStatus == 5 ~ "Authors locating/preparing data",
+    dataStatus == 6 ~ "Authors considering request",
+    dataStatus == 7 ~ "Authors want more information",
+    dataStatus == 8 ~ "Data sharing system already in place (unrestricted)",
+    dataStatus == 9 ~ "Data sharing system already in place (restricted)",
+    dataStatus == 10 ~ "Data sharing statement says data are available",
+    TRUE ~ "CLASSIFICATION ERROR"
+  ))
+
+# add higher level publication year classification layer
+d <- d %>%
+  mutate(timeFrame = case_when(
+    publicationDate %in% seq(2008, 2013) ~ "2008-2013",
+    publicationDate %in% seq(2016, 2018) ~ "2016-2018",
+    TRUE ~ "CLASSIFICATION ERROR"
+  ))
+
+# convert to factors and set order
+d <- d %>%
+  mutate(timeFrame = factor(timeFrame),
+         dataStatusHigh = factor(dataStatusHigh, levels = c("Available, unrestricted","Available, restricted","Not available")),
+         field = factor(field))
+
+```
+
+```{r}
+# citations
+
+d %>%
+  group_by(field, timeFrame) %>%
+  summarise(median = median(citations),
+            IQR_low = round(quantile(citations, .25),0),
+            IQR_high = round(quantile(citations, .75),0))
+```
+
+```{r}
+facets <- data_frame(facetNames = unique(d$dataStatusHigh),1)
+
+d %>% 
+  count(field, dataStatusHigh, timeFrame, .drop = F) %>%
+  group_by(field, timeFrame) %>%
+  mutate(N = sum(n), percent = n/sum(n)*100) %>%
+  ungroup() %>%
+  mutate(lineGroup = as.numeric((factor(paste0(field,'_',dataStatusHigh))))) %>%
+  ggplot(aes(x = timeFrame, y = percent, shape = field, group = field)) +
+  geom_rect(aes(fill = dataStatusHigh),xmin = -Inf,xmax = Inf,
+            ymin = -Inf,ymax = Inf,alpha = 0.1) +
+  geom_line(aes(group = lineGroup)) +
+  geom_point(size = 5, alpha = 1, colour ='black', aes(fill = dataStatusHigh)) +
+  facet_wrap(~ dataStatusHigh) +
+  scale_fill_manual(values = c(green, yellow, red)) +
+  scale_shape_manual(name = 'Domain', values = c(21,24)) +
+  ylim(c(0,100)) +
+  xlab('Time period') +
+  ylab('Articles (%)') +
+  guides(fill = 'none') +
+  theme_minimal(base_size = 18) +
+  theme(panel.background = element_rect(fill = 'white', colour = 'black'),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank())
+```
+
+```{r}
+# calculate confidence intervals
+conf_ints <- MultinomCI(
+  d %>%
+    count(dataStatusHigh, .drop = F) %>% 
+    pull(n), 
+  conf.level=0.95,
+  method="sisonglaz")
+
+availability <- d %>% 
+  count(dataStatusHigh, .drop = F) %>% 
+  bind_cols(conf_ints) %>%
+  mutate(percent = est*100, lwr.ci = lwr.ci*100, upr.ci = upr.ci*100) %>%
+  select(-est) %>%
+  mutate(report = paste0(n,' (',round(percent,0),'%, 95% CI [',round(lwr.ci,0),'% - ',round(upr.ci,0),'%])'))
+```
+
+```{r}
+# field categories
+
+field_tab <- d %>%
+  count(field, dataStatusHigh, .drop = F)
+
+dat <- data.frame(
+  "med_no" = c(field_tab %>% filter(field == "Non-medical", dataStatusHigh == "Not available") %>% pull(n),
+               field_tab %>% filter(field == "Non-medical", dataStatusHigh == "Available, restricted") %>% pull(n),
+               field_tab %>% filter(field == "Non-medical", dataStatusHigh == "Available, unrestricted") %>% pull(n)),
+  "med_yes" = c(field_tab %>% filter(field == "Medical", dataStatusHigh == "Not available") %>% pull(n),
+                field_tab %>% filter(field == "Medical", dataStatusHigh == "Available, restricted") %>% pull(n),
+                field_tab %>% filter(field == "Medical", dataStatusHigh == "Available, unrestricted") %>% pull(n)),
+  row.names = c("Not available", "Restricted", "Unrestricted"),
+  stringsAsFactors = FALSE
+)
+colnames(dat) <- c("Non-med", "Med")
+
+fish_out_field <- fisher.test(dat)
+
+# time period categories
+time_tab <- d %>%
+  count(timeFrame, dataStatusHigh, .drop = F)
+
+dat2 <- data.frame(
+  "early" = c(time_tab %>% filter(timeFrame == "2008-2013", dataStatusHigh == "Not available") %>% pull(n),
+              time_tab %>% filter(timeFrame == "2008-2013", dataStatusHigh == "Available, restricted") %>% pull(n),
+              time_tab %>% filter(timeFrame == "2008-2013", dataStatusHigh == "Available, unrestricted") %>% pull(n)),
+  "late" = c(time_tab %>% filter(timeFrame == "2016-2018", dataStatusHigh == "Not available") %>% pull(n),
+             time_tab %>% filter(timeFrame == "2016-2018", dataStatusHigh == "Available, restricted") %>% pull(n),
+             time_tab %>% filter(timeFrame == "2016-2018", dataStatusHigh == "Available, unrestricted") %>% pull(n)),
+  row.names = c("Not available", "Restricted", "Unrestricted"),
+  stringsAsFactors = FALSE
+)
+
+fish_out_time <- fisher.test(dat2)
+```
+
+# Data availability overall, between domains, and across time
+Overall, out of the `r nrow(d)` empirical articles, the data of `r availability %>% filter(dataStatusHigh == "Available, unrestricted") %>% pull(report)` were available in unrestricted form, the data of `r availability %>% filter(dataStatusHigh == "Available, restricted") %>% pull(report)` were available with restrictions, and the data of `r availability %>% filter(dataStatusHigh == "Not available") %>% pull(report)` were not available. The differences between domains and between time periods were marginal (Figure 1): compared to the datasets from the 2008-2013 articles, there were proportionally fewer datasets available without restrictions, more available with restrictions, and more unavailable among the 2016-2018 articles. Datasets in the medical domain were available slightly more often than datasets in the non-medical domain. Fisher’s exact tests indicated no significant association between data sharing status and time period (two-tailed p = `r round(fish_out_time$p.value,3)`) or domain (two-tailed p = `r round(fish_out_field$p.value,3)`).
+
+# Data available without restrictions
+Of the `r availability %>% filter(dataStatusHigh == "Available, unrestricted") %>% pull(n)` datasets available in unrestricted form, `r d %>% count(dataStatusLabel, .drop = F) %>% filter(dataStatusLabel == "Data sharing statement says data are available") %>% pull(n)` were from articles which contained a data availability statement providing a link to the available data; `r d %>% count(dataStatusLabel, .drop = F) %>% filter(dataStatusLabel == "Data sharing system already in place (unrestricted)") %>% pull(n)` were from articles that did not contain a data availability statement, but the authors informed us that there was an unrestricted data sharing system already in place; and `r d %>% count(dataStatusLabel, .drop = F) %>% filter(dataStatusLabel == "Data Ark, unrestricted") %>% pull(n)` were from articles for which the authors agreed to make the data freely available in the Data Ark (see https://osf.io/ndmsr/). In all of these cases, we verified that the data were actually available.
+
+# Data available with restrictions
+Of the `r availability %>% filter(dataStatusHigh == "Available, restricted") %>% pull(n)` datasets available with restrictions, `r d %>% filter(dataStatusHigh == "Available, restricted", dataStatus == 3) %>% nrow()` was shared only with our team and the authors stated that they did not want the data to be shared publicly in the Data Ark. For the other `r d %>% filter(dataStatusHigh == "Available, restricted", dataStatus == 9) %>% nrow()` datasets, the authors informed us that there was a restricted data sharing system already in place. `r d %>% filter(dataStatusHigh == "Available, restricted", requirements == 'C') %>% nrow()` datasets required a fee for access. The other `r d %>% filter(dataStatusHigh == "Available, restricted", requirements != 'C') %>% nrow()` datasets each had multiple restrictions. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'B')) %>% nrow()` required a data use agreement. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'D')) %>% nrow()` required approval from an ethics board. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'E')) %>% nrow()` required sharing a specific intention for reusing the data. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'G')) %>% nrow()` required that requestors be from a recognised academic institution. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'H')) %>% nrow()` would only allow remote access to the data. We did not attempt to verify whether complying with these restrictions would enable us to access the data.
+
+```{r}
+d %>%
+  count(reasons) %>%
+  filter(reasons != 'NA') 
+```
+
+# Data not available
+Of the `r availability %>% filter(dataStatusHigh == "Not available") %>% pull(n)` datasets classified as unavailable, `r d %>% filter(dataStatusHigh == "Not available", dataStatusLabel == "No response") %>% nrow()` involved no response from the authors, despite sending multiple reminders. In 2 cases, the authors said they were locating or preparing the data, but did not supply any data or respond to any follow up as of the time of publication since our most recent request on January 5th, 2021. In the remaining 21 cases, the authors explicitly stated that they would not share the data. All of these authors provided at least one reason for not sharing the data. These were (a) legal or ethical constraints (n = 11); (b) lack of resources needed to prepare the data for sharing (n = 2); (c) data do not belong to the authors (n = 2); (d) the data no longer exist or cannot be located (n = 2); (e) the authors wish to retain exclusive use of the data (n = 1).
+
+
