@@ -3,12 +3,13 @@ title: "Analysis for Data Ark Social Sciences"
 format: pdf
 ---
 
-
-```{r}
+```{r message = FALSE}
 library(tidyverse)
 library(here)
 library(DescTools)
+```
 
+```{r}
 red <- "#fdd2ce"
 yellow <- "#f2d15a"
 green <- "#b8e6c0"
@@ -158,13 +159,6 @@ Of the `r availability %>% filter(dataStatusHigh == "Available, unrestricted") %
 # Data available with restrictions
 Of the `r availability %>% filter(dataStatusHigh == "Available, restricted") %>% pull(n)` datasets available with restrictions, `r d %>% filter(dataStatusHigh == "Available, restricted", dataStatus == 3) %>% nrow()` was shared only with our team and the authors stated that they did not want the data to be shared publicly in the Data Ark. For the other `r d %>% filter(dataStatusHigh == "Available, restricted", dataStatus == 9) %>% nrow()` datasets, the authors informed us that there was a restricted data sharing system already in place. `r d %>% filter(dataStatusHigh == "Available, restricted", requirements == 'C') %>% nrow()` datasets required a fee for access. The other `r d %>% filter(dataStatusHigh == "Available, restricted", requirements != 'C') %>% nrow()` datasets each had multiple restrictions. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'B')) %>% nrow()` required a data use agreement. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'D')) %>% nrow()` required approval from an ethics board. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'E')) %>% nrow()` required sharing a specific intention for reusing the data. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'G')) %>% nrow()` required that requestors be from a recognised academic institution. `r d %>% filter(dataStatusHigh == "Available, restricted", str_detect(requirements, 'H')) %>% nrow()` would only allow remote access to the data. We did not attempt to verify whether complying with these restrictions would enable us to access the data.
 
-```{r}
-d %>%
-  count(reasons) %>%
-  filter(reasons != 'NA') 
-```
-
 # Data not available
-Of the `r availability %>% filter(dataStatusHigh == "Not available") %>% pull(n)` datasets classified as unavailable, `r d %>% filter(dataStatusHigh == "Not available", dataStatusLabel == "No response") %>% nrow()` involved no response from the authors, despite sending multiple reminders. In 2 cases, the authors said they were locating or preparing the data, but did not supply any data or respond to any follow up as of the time of publication since our most recent request on January 5th, 2021. In the remaining 21 cases, the authors explicitly stated that they would not share the data. All of these authors provided at least one reason for not sharing the data. These were (a) legal or ethical constraints (n = 11); (b) lack of resources needed to prepare the data for sharing (n = 2); (c) data do not belong to the authors (n = 2); (d) the data no longer exist or cannot be located (n = 2); (e) the authors wish to retain exclusive use of the data (n = 1).
-
+Of the `r availability %>% filter(dataStatusHigh == "Not available") %>% pull(n)` datasets classified as unavailable, `r d %>% filter(dataStatusHigh == "Not available", dataStatusLabel == "No response") %>% nrow()` involved no response from the authors, despite sending multiple reminders. In `r d %>% filter(dataStatusHigh == "Not available", dataStatusLabel == "Authors locating/preparing data") %>% nrow()` cases, the authors said they were locating or preparing the data, but did not supply any data or respond to any follow up as of the time of publication since our most recent request on January 5th, 2021. In the remaining `r d %>% filter(dataStatusHigh == "Not available", dataStatusLabel == "Will not share") %>% nrow()` cases, the authors explicitly stated that they would not share the data. All of these authors provided at least one reason for not sharing the data. These were (a) legal or ethical constraints (n = `r d %>% filter(str_detect(reasons, 'A')) %>% nrow()`); (b) data do not belong to the authors (n = `r d %>% filter(str_detect(reasons, 'D')) %>% nrow()`); (c) lack of resources needed to prepare the data for sharing (n = `r d %>% filter(str_detect(reasons, 'B')) %>% nrow()`); (d) the data no longer exist or cannot be located (n = `r d %>% filter(str_detect(reasons, 'E')) %>% nrow()`); (e) the authors wish to retain exclusive use of the data (n = `r d %>% filter(str_detect(reasons, 'F')) %>% nrow()`).
 
