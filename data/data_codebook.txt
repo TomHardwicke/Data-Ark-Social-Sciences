@@ -37,7 +37,7 @@ Column L "dataStatus": the data sharing status assigned to the article. Options 
 
 10	The data are already available (data sharing statement says they are available and we verified this)
 
-0       No response 1       Online data repository, completely open access 2       Online data repository, controlled access (please state what prerequisites, criteria and processes you might consider for deciding whether to share the data with others) 3       Sharing with the METRICS team only, not to be shared with anyone else 4       Cannot share data (please state the key reason(s)) 5       Pending e.g., data being located/prepared (but no update as of 12th October, 2022)
+0       No response 1       Online data repository, completely open access 2       Online data repository, controlled access (please state what prerequisites, criteria and processes you might consider for deciding whether to share the data with others) 3       Sharing with the METRICS team only, not to be shared with anyone else 4       Cannot share data (please state the key reason(s)) 5       Pending e.g., data being located/prepared (but no update as of 15th August, 2023)
 6       Considering and will get back to us 7       Wants more information from us before sharing 8       Data sharing system already in place (no restrictions)
 9       Data sharing system already in place (restrictions)
 
