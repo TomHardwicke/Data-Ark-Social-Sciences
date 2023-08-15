@@ -4,7 +4,7 @@ Project title: Expanding the Data Ark: Retrieving, preserving, and liberating da
 
 Description: This codebook documents the data stored in the file 'data.csv'. The dataset contains information about the 160 social sciences papers included in the study sample. There is one row per article. The information includes bibliogprahic information (e.g., publication source) and the data availability status based on our assessment.
 
-Source: Bibliographic information was obtained from Clarivate Analytics Web of Science Core Collection accessed via Stanford University in April, 2019. Information on data sharing status was manually entered by the authors over the course of the study.
+Source: Bibliographic information was obtained from Clarivate Analytics Web of Science Core Collection accessed via Stanford University in February, 2019. Information on data sharing status was  entered manually by the authors over the course of the study.
 
 
 Columns:
