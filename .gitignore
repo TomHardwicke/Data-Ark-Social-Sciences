@@ -3,6 +3,7 @@ researchFiles/
 protocol/
 data/raw/
 analysis/old/
+Analysis/analysis_files/
 dissemination/
 manuscript/figs
 
@@ -53,3 +54,4 @@ analysis/preliminaryAnalysis.html
 *.log
 manuscript/manuscript.pdf
 analysis/analysis.pdf
+analysis/analysis.html
