@@ -1,6 +1,6 @@
 ---
 title: "Analysis for Data Ark Social Sciences"
-format: pdf
+format: html
 ---
 
 ```{r message = FALSE}
