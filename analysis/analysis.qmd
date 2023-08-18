@@ -93,7 +93,7 @@ d %>%
 Now let's make a graph (this will be Figure 1 in the paper) to visualize high-level data sharing status across time periods and domains.
 
 ```{r}
-#| fig-width: 10
+#| fig-width: 12
 facets <- tibble(facetNames = unique(d$dataStatusHigh),1) # set up titles for each facet
 
 d %>% 
