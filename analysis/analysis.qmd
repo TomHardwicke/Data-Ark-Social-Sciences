@@ -96,7 +96,7 @@ Now let's make a graph (this will be Figure 1 in the paper) to visualize high-le
 #| fig-width: 12
 facets <- tibble(facetNames = unique(d$dataStatusHigh),1) # set up titles for each facet
 
-d %>% 
+plot <- d %>% 
   count(field, dataStatusHigh, timeFrame, .drop = F) %>%
   group_by(field, timeFrame) %>%
   mutate(N = sum(n), percent = n/sum(n)*100) %>%
@@ -118,6 +118,13 @@ d %>%
   theme(panel.background = element_rect(fill = 'white', colour = 'black'),
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank())
+```
+
+```{r fig1}
+#| fig.width: 12
+#| fig.height: 8
+#| fig.path: 'figs/'
+plot
 ```
 
 Now let's prepare some descriptive statistics and confidence intervals to report in the main text.
