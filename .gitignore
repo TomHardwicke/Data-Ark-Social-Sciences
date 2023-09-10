@@ -1,5 +1,5 @@
 # folders to ignore
-researchFiles/
+Misc/
 protocol/
 data/raw/
 analysis/old/
